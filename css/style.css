@@ -690,6 +690,14 @@ svg { stroke-width: 2.2; }
   margin-top: 10px;
 }
 
+.form-error {
+  margin-top: 12px;
+  color: #b3261e;
+  font-size: 0.95rem;
+}
+.form-error a { color: inherit; text-decoration: underline; }
+.hp-field { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+
 .form-success {
   display: none;
   background: var(--pastel-green-bg);

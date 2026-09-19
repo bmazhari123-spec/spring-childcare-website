@@ -328,16 +328,42 @@ function initContactForm() {
   var form = document.querySelector("#contact-form");
   if (!form) return;
 
-  var nextField = form.querySelector('input[name="_next"]');
-  if (nextField) {
-    nextField.value = new URL("thank-you.html", window.location.href).href;
-  }
-
   var submitBtn = form.querySelector('button[type="submit"]');
-  if (submitBtn) {
-    form.addEventListener("submit", function () {
+  var errorEl = form.querySelector("#form-error");
+  var btnLabel = submitBtn ? submitBtn.textContent : "";
+
+  var showError = function () {
+    if (submitBtn) {
+      submitBtn.classList.remove("is-loading");
+      submitBtn.textContent = btnLabel;
+    }
+    if (errorEl) errorEl.hidden = false;
+  };
+
+  // Submit via fetch so the thank-you page only shows after Web3Forms
+  // confirms delivery. A failed send shows an error instead.
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (errorEl) errorEl.hidden = true;
+    if (submitBtn) {
       submitBtn.classList.add("is-loading");
       submitBtn.textContent = "Sending...";
-    });
-  }
+    }
+
+    fetch(form.action, {
+      method: "POST",
+      headers: { Accept: "application/json" },
+      body: new FormData(form)
+    })
+      .then(function (res) {
+        return res.json().then(function (data) {
+          if (res.ok && data.success) {
+            window.location.href = "thank-you.html";
+          } else {
+            showError();
+          }
+        });
+      })
+      .catch(showError);
+  });
 }
